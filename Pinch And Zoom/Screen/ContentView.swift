@@ -26,6 +26,8 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ZStack {
+                Color.clear
+
                 Image("magazine-front-cover")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -42,23 +44,23 @@ struct ContentView: View {
                                 imageScale = 5
                             }
                         } else {
-                           resetImageState()
+                            resetImageState()
                         }
                     })
                 // MARK: - DRAG GESTURE
                     .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            withAnimation(.linear(duration: 1.0)) {
-                                imageOffset = value.translation
-                            }
+                        DragGesture()
+                            .onChanged { value in
+                                withAnimation(.linear(duration: 1.0)) {
+                                    imageOffset = value.translation
+                                }
 
-                        }
-                        .onEnded { _ in
-                            if imageScale <= 1 {
-                                resetImageState()
                             }
-                        }
+                            .onEnded { _ in
+                                if imageScale <= 1 {
+                                    resetImageState()
+                                }
+                            }
                     )
             }
             .navigationTitle("Pinch and Zoom")
@@ -68,6 +70,13 @@ struct ContentView: View {
                     isAnimating = true
                 }
             })
+            // MARK: - INFO PANEL
+            .overlay(
+                InfoPanelView(scale: imageScale, offset: imageOffset)
+                    .padding(.horizontal)
+                    .padding(.top, 30),
+                alignment: .top
+            )
         }
         .navigationViewStyle(.stack)
     }
@@ -77,5 +86,7 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .preferredColorScheme(.dark)
     }
 }
+

@@ -15,6 +15,9 @@ struct ContentView: View {
     @State private var imageOffset: CGSize = .zero
     @State private var isDrawerOpen: Bool = false
 
+    let page: [Page] = pageData
+    @State private var pageIndex: Int = 1
+
     // MARK: - FUNCTION
     private func resetImageState() {
         return withAnimation(.spring()) {
@@ -23,13 +26,17 @@ struct ContentView: View {
         }
     }
 
+    private func currentPage() -> String {
+        return page[pageIndex - 1].imageName
+    }
+
     // MARK: - CONTENT
     var body: some View {
         NavigationView {
             ZStack {
                 Color.clear
 
-                Image("magazine-front-cover")
+                Image(currentPage())
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .cornerRadius(10)
@@ -162,6 +169,24 @@ struct ContentView: View {
                         })
 
                     // MARK: - THUMBNAILS
+                    ForEach(page) {item in
+                        Image(item.thumbnailName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80)
+                            .cornerRadius(8)
+                            .shadow(radius: 4)
+                            .opacity(isDrawerOpen ? 1 : 0)
+                            .animation(.easeOut(duration: 0.5), value: isDrawerOpen)
+                            .onTapGesture(perform: {
+                                withAnimation(.easeOut(duration: 0.5)) {
+                                    isAnimating = true
+                                    pageIndex = item.id
+                                    isDrawerOpen = false
+                                }
+                            })
+                    }
+
                     Spacer()
                 }
                     .padding(EdgeInsets(top: 16, leading: 8, bottom: 16, trailing: 8))
@@ -169,7 +194,7 @@ struct ContentView: View {
                     .cornerRadius(12)
                     .opacity(isAnimating ? 1 : 0)
                     .frame(width: 260)
-                    .padding(.top, UIScreen.main.bounds.width / 12)
+                    .padding(.top, UIScreen.main.bounds.width / 5)
                     .offset(x: isDrawerOpen ? 20 : 215)
                 ,
                 alignment: .topTrailing
